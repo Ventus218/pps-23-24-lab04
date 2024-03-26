@@ -35,20 +35,22 @@ object SchoolModel:
 
   object SchoolModuleImpl extends SchoolModule:
     opaque type Course = CourseImpl
-    // QUESTION: 
-    // I suppose that making this case class (and also Teacher and School) public
-    // is wrong because it would mean showing implementations details.
-    // But without doing it i don't know how to properly test this module.
-    // What should i do?
-    case class CourseImpl(name: String)
+    private case class CourseImpl(name: String)
 
     opaque type Teacher = TeacherImpl
-    case class TeacherImpl(name: String, courses: Sequence[Course])
+    private case class TeacherImpl(name: String, courses: Sequence[Course])
 
     opaque type School = SchoolImpl
-    case class SchoolImpl(teachers: Sequence[Teacher], courses: Sequence[Course])
+    private case class SchoolImpl(teachers: Sequence[Teacher], courses: Sequence[Course])
 
     def school(): School = SchoolImpl(Nil(), Nil())
+    
+    // QUESTION:
+    // Is this a good way of allowing proper testing while keeping
+    // case classes private?
+    private[adts] def _school(teachers: Sequence[Teacher], courses: Sequence[Course]): School = SchoolImpl(teachers, courses)
+    private[adts] def _course(name: String): Course = CourseImpl(name)
+    private[adts] def _teacher(name: String, courses: Sequence[Course]): Teacher = TeacherImpl(name, courses)
 
     extension (school: School) 
       override def addCourse(name: String): School = ???
