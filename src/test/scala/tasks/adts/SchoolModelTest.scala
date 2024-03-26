@@ -5,6 +5,7 @@ import org.junit.Assert.*
 import u03.Sequences.Sequence.*
 import SchoolModel.*
 import SchoolModel.given
+import u03.Optionals.Optional.*
 
 class SchoolModelTest:
 
@@ -22,6 +23,12 @@ class SchoolModelTest:
     
     @Test def testAddTeacher(): Unit =
         assertEquals(_school(Cons(t, Nil()), Nil()), school().addTeacher(teacherName))
+    
+    @Test def testTeacherByNamePresent(): Unit =
+        assertEquals(Just(t), school().addTeacher(teacherName).teacherByName(teacherName))
+
+    @Test def testTeacherByNameNotPresent(): Unit =
+        assertEquals(Empty(), school().teacherByName(teacherName))
     
     @Test def testAddCourse(): Unit =
         assertEquals(_school(Nil(), Cons(c, Nil())), school().addCourse(courseName))

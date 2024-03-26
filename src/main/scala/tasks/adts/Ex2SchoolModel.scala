@@ -66,7 +66,9 @@ object SchoolModel:
       override def addTeacher(name: String): School =
         SchoolImpl(Cons(TeacherImpl(name, Nil()), school.teachers), school.courses)
 
-      override def teacherByName(name: String): Optional[Teacher] = ???
+      override def teacherByName(name: String): Optional[Teacher] = school match
+        case SchoolImpl(Cons(h, t), _) => if h.name == name then Optional.Just(h) else teacherByName(name)
+        case _ => Optional.Empty()
 
       override def courseByName(name: String): Optional[Course] = ???
 
