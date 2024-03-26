@@ -5,9 +5,9 @@ import org.junit.Assert.*
 import u03.Sequences.Sequence.*
 import SchoolModel.*
 import SchoolModel.given
-import SchoolModel.SchoolModelImpl.SchoolImpl
-import SchoolModel.SchoolModelImpl.TeacherImpl
-import SchoolModel.SchoolModelImpl.CourseImpl
+import SchoolModel.SchoolModuleImpl.SchoolImpl
+import SchoolModel.SchoolModuleImpl.TeacherImpl
+import SchoolModel.SchoolModuleImpl.CourseImpl
 
 class SchoolModelTest:
 

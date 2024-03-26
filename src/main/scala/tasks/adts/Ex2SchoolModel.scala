@@ -31,9 +31,9 @@ object SchoolModel:
       def setTeacherToCourse(teacher: Teacher, course: Course): School
       def coursesOfATeacher(teacher: Teacher): Sequence[Course]
   
-  given SchoolModule = SchoolModelImpl
+  given SchoolModule = SchoolModuleImpl
 
-  object SchoolModelImpl extends SchoolModule:
+  object SchoolModuleImpl extends SchoolModule:
     opaque type Course = CourseImpl
     // QUESTION: 
     // I suppose that making this case class (and also Teacher and School) public
