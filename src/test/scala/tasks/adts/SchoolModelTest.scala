@@ -23,6 +23,9 @@ class SchoolModelTest:
     
     @Test def testAddTeacher(): Unit =
         assertEquals(_school(Cons(t, Nil()), Nil()), school().addTeacher(teacherName))
+
+    @Test def testNameOfTeacher(): Unit =
+        assertEquals(teacherName, school().nameOfTeacher(t))
     
     @Test def testTeacherByNamePresent(): Unit =
         assertEquals(Just(t), school().addTeacher(teacherName).teacherByName(teacherName))
@@ -32,3 +35,6 @@ class SchoolModelTest:
     
     @Test def testAddCourse(): Unit =
         assertEquals(_school(Nil(), Cons(c, Nil())), school().addCourse(courseName))
+
+    @Test def testNameOfCourse(): Unit =
+        assertEquals(courseName, school().nameOfCourse(c))

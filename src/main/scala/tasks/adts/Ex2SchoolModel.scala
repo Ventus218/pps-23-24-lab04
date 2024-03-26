@@ -29,8 +29,12 @@ object SchoolModel:
       def addCourse(name: String): School
       def teacherByName(name: String): Optional[Teacher]
       def courseByName(name: String): Optional[Course]
+      // I did not get why making this an extension method as it doesn't need
+      // a school parameter. (Same goes for nameOfCourse method)
       def nameOfTeacher(teacher: Teacher): String
-      def nameOfCourse(teacher: Teacher): String
+      // nameOfCourse had a Teacher as parameter but i think was a copy-paste error so i changed it to Course.
+      // The reason is that a teacher may have no courses and the result should be optional
+      def nameOfCourse(course: Course): String
       def setTeacherToCourse(teacher: Teacher, course: Course): School
       def coursesOfATeacher(teacher: Teacher): Sequence[Course]
   
@@ -59,7 +63,8 @@ object SchoolModel:
       override def addCourse(name: String): School =
         SchoolImpl(school.teachers, Cons(CourseImpl(name), school.courses))
 
-      override def nameOfTeacher(teacher: Teacher): String = ???
+      override def nameOfTeacher(teacher: Teacher): String =
+        teacher.name
 
       override def setTeacherToCourse(teacher: Teacher, course: Course): School = ???
 
@@ -72,6 +77,7 @@ object SchoolModel:
 
       override def courseByName(name: String): Optional[Course] = ???
 
-      override def nameOfCourse(teacher: Teacher): String = ???
+      override def nameOfCourse(course: Course): String = 
+        course.name
 
       override def coursesOfATeacher(teacher: Teacher): Sequence[Course] = ???
