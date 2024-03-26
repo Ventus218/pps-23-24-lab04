@@ -14,8 +14,14 @@ class SchoolModelTest:
     val teacherName = "t"
     val t = _teacher(teacherName, Nil())
 
+    val courseName = "c"
+    val c = _course(courseName)
+
     @Test def newSchool(): Unit =
         assertEquals(_school(Nil(), Nil()), school())
     
     @Test def testAddTeacher(): Unit =
         assertEquals(_school(Cons(t, Nil()), Nil()), school().addTeacher(teacherName))
+    
+    @Test def testAddCourse(): Unit =
+        assertEquals(_school(Nil(), Cons(c, Nil())), school().addCourse(courseName))

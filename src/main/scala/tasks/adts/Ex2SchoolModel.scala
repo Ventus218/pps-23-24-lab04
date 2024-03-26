@@ -56,7 +56,8 @@ object SchoolModel:
     private[adts] def _teacher(name: String, courses: Sequence[Course]): Teacher = TeacherImpl(name, courses)
 
     extension (school: School) 
-      override def addCourse(name: String): School = ???
+      override def addCourse(name: String): School =
+        SchoolImpl(school.teachers, Cons(CourseImpl(name), school.courses))
 
       override def nameOfTeacher(teacher: Teacher): String = ???
 
