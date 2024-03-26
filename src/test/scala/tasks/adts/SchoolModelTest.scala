@@ -44,3 +44,7 @@ class SchoolModelTest:
 
     @Test def testCourseByNameNotPresent(): Unit =
         assertEquals(Empty(), school().courseByName(courseName))
+
+    @Test def testCoursesOfATeacher(): Unit =
+        assertEquals(Nil(), school().coursesOfATeacher(t))
+        assertEquals(Cons(c, Nil()), school().coursesOfATeacher(_teacher("", Cons(c, Nil()))))

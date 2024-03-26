@@ -30,7 +30,7 @@ object SchoolModel:
       def teacherByName(name: String): Optional[Teacher]
       def courseByName(name: String): Optional[Course]
       // I did not get why making this an extension method as it doesn't need
-      // a school parameter. (Same goes for nameOfCourse method)
+      // a school parameter. (Same goes for nameOfCourse and coursesOfATeacher methods)
       def nameOfTeacher(teacher: Teacher): String
       // nameOfCourse had a Teacher as parameter but i think was a copy-paste error so i changed it to Course.
       // The reason is that a teacher may have no courses and the result should be optional
@@ -82,4 +82,5 @@ object SchoolModel:
       override def nameOfCourse(course: Course): String = 
         course.name
 
-      override def coursesOfATeacher(teacher: Teacher): Sequence[Course] = ???
+      override def coursesOfATeacher(teacher: Teacher): Sequence[Course] = 
+        teacher.courses
