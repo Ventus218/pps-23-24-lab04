@@ -38,3 +38,9 @@ class SchoolModelTest:
 
     @Test def testNameOfCourse(): Unit =
         assertEquals(courseName, school().nameOfCourse(c))
+
+    @Test def testCourseByNamePresent(): Unit =
+        assertEquals(Just(c), school().addCourse(courseName).courseByName(courseName))
+
+    @Test def testCourseByNameNotPresent(): Unit =
+        assertEquals(Empty(), school().courseByName(courseName))
