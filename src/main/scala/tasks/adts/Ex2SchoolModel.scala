@@ -21,6 +21,9 @@ object SchoolModel:
     type Teacher
     type Course
     def school(): School
+    private[adts] def _school(teachers: Sequence[Teacher], courses: Sequence[Course]): School
+    private[adts] def _course(name: String): Course
+    private[adts] def _teacher(name: String, courses: Sequence[Course]): Teacher
     extension (school: School)
       def addTeacher(name: String): School
       def addCourse(name: String): School
@@ -59,7 +62,8 @@ object SchoolModel:
 
       override def setTeacherToCourse(teacher: Teacher, course: Course): School = ???
 
-      override def addTeacher(name: String): School = ???
+      override def addTeacher(name: String): School =
+        SchoolImpl(Cons(TeacherImpl(name, Nil()), school.teachers), school.courses)
 
       override def teacherByName(name: String): Optional[Teacher] = ???
 
