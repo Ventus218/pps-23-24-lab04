@@ -34,16 +34,16 @@ object Ex5Traversable:
       case Optional.Just(a) => f(a)
       case _ => ()
 
-@main def tryTraversables =
-  import Ex5Traversable.*
-  import Ex5Traversable.TraversableSequence.*
-  // import Ex5Traversable.TraversableOptional.*
-  // QUESTION:
-  // If both modules are imported then i can't use logAll because the compiler says it's ambiguous
-  // Why isn't the compiler able to infer which logAll to use based on the type of its parameters?
-  import Ex5Traversable.given
+  @main def tryTraversables =
+    import TraversableSequence.logAll
+    // QUESTION:
+    // If both modules are imported then i can't use logAll because the compiler says it's ambiguous
+    // Why isn't the compiler able to infer which logAll to use based on the type of its parameters?
 
-  Cons(10, Cons(20, Nil())).logAll
-  TraversableOptional.logAll(Optional.Just(100))
-  
-  Cons(10, Cons(20, Nil())).logAll(using println(_)) // Overriding the given
+    // import TraversableOptional.logAll
+    // Optional.Just(100).logAll
+
+    Cons(10, Cons(20, Nil())).logAll
+    TraversableOptional.logAll(Optional.Just(100))
+    
+    Cons(10, Cons(20, Nil())).logAll(using println(_)) // Overriding the given
