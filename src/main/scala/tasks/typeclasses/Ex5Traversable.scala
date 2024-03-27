@@ -1,6 +1,7 @@
 package u04lab
 import u03.Sequences.* 
 import Sequence.*
+import u03.Optionals.Optional
 
 /*  Exercise 5: 
  *  - Generalise by ad-hoc polymorphism logAll, such that:
@@ -17,10 +18,32 @@ import Sequence.*
 
 object Ex5Traversable:
 
+  trait Traversable[T[_]]:
+    extension [A](t: T[A]) def logAll(using f: A => Unit): Unit
+    
   def log[A](a: A): Unit = println("The next element is: "+a)
+  given (Any => Unit) = log
 
-  def logAll[A](seq: Sequence[A]): Unit = seq match
-    case Cons(h, t) => log(h); logAll(t)
-    case _ => ()
+  object TraversableSequence extends Traversable[Sequence]:
+    extension [A](t: Sequence[A]) override def logAll(using f: A => Unit): Unit = t match
+      case Cons(h, t) => f(h); t.logAll
+      case _ => ()
 
+  object TraversableOptional extends Traversable[Optional]:
+    extension [A](t: Optional[A]) override def logAll(using f: A => Unit): Unit = t match
+      case Optional.Just(a) => f(a)
+      case _ => ()
+
+@main def tryTraversables =
+  import Ex5Traversable.*
+  import Ex5Traversable.TraversableSequence.*
+  // import Ex5Traversable.TraversableOptional.*
+  // QUESTION:
+  // If both modules are imported then i can't use logAll because the compiler says it's ambiguous
+  // Why isn't the compiler able to infer which logAll to use based on the type of its parameters?
+  import Ex5Traversable.given
+
+  Cons(10, Cons(20, Nil())).logAll
+  TraversableOptional.logAll(Optional.Just(100))
   
+  Cons(10, Cons(20, Nil())).logAll(using println(_)) // Overriding the given
