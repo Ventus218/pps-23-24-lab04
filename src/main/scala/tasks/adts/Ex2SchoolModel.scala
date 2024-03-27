@@ -59,6 +59,16 @@ object SchoolModel:
     private[adts] def _course(name: String): Course = CourseImpl(name)
     private[adts] def _teacher(name: String, courses: Sequence[Course]): Teacher = TeacherImpl(name, courses)
 
+    /// Adds a Course to a Sequence[Course] only if not already present
+    extension (s: Sequence[Course]) private def addUniqueCourse(c: Course): Sequence[Course] = s match
+      case Cons(h, t) => if h != c then t.addUniqueCourse(c) else s
+      case Nil() => Cons(c, s)
+
+    /// Adds a Teacher to a Sequence[Teacher] only if not already present
+    extension (s: Sequence[Teacher]) private def addUniqueTeacher(teacher: Teacher): Sequence[Teacher] = s match
+      case Cons(h, t) => if h != teacher then t.addUniqueTeacher(teacher) else s
+      case Nil() => Cons(teacher, s)
+
     extension (school: School) 
       override def addCourse(name: String): School =
         SchoolImpl(school.teachers, Cons(CourseImpl(name), school.courses))
@@ -66,7 +76,10 @@ object SchoolModel:
       override def nameOfTeacher(teacher: Teacher): String =
         teacher.name
 
-      override def setTeacherToCourse(teacher: Teacher, course: Course): School = ???
+      override def setTeacherToCourse(teacher: Teacher, course: Course): School =
+        val schoolWithCourse = SchoolImpl(school.teachers, school.courses.addUniqueCourse(course))
+        val teacherWithCourse = TeacherImpl(teacher.name, teacher.courses.addUniqueCourse(course))
+        SchoolImpl(schoolWithCourse.teachers.addUniqueTeacher(teacherWithCourse), schoolWithCourse.courses)
 
       override def addTeacher(name: String): School =
         SchoolImpl(Cons(TeacherImpl(name, Nil()), school.teachers), school.courses)

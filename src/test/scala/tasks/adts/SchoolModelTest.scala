@@ -48,3 +48,14 @@ class SchoolModelTest:
     @Test def testCoursesOfATeacher(): Unit =
         assertEquals(Nil(), school().coursesOfATeacher(t))
         assertEquals(Cons(c, Nil()), school().coursesOfATeacher(_teacher("", Cons(c, Nil()))))
+
+    @Test def testSetTeacherToCourse(): Unit =
+        val s = school().addTeacher(teacherName).addCourse(courseName).setTeacherToCourse(t, c)
+        val expected = _school(Cons(_teacher(teacherName, Cons(c, Nil())), Nil()), Cons(c, Nil()))
+        assertEquals(expected, s)
+
+    @Test def testSetTeacherToCourseWithNewTeacherAndCourse(): Unit =
+        val s = school().setTeacherToCourse(t, c)
+        val expected = _school(Cons(_teacher(teacherName, Cons(c, Nil())), Nil()), Cons(c, Nil()))
+        assertEquals(expected, s)
+    
