@@ -71,7 +71,7 @@ object SchoolModel:
 
     extension (school: School) 
       override def addCourse(name: String): School =
-        SchoolImpl(school.teachers, Cons(CourseImpl(name), school.courses))
+        SchoolImpl(school.teachers, school.courses.addUniqueCourse(CourseImpl(name)))
 
       override def nameOfTeacher(teacher: Teacher): String =
         teacher.name
@@ -82,7 +82,7 @@ object SchoolModel:
         SchoolImpl(schoolWithCourse.teachers.addUniqueTeacher(teacherWithCourse), schoolWithCourse.courses)
 
       override def addTeacher(name: String): School =
-        SchoolImpl(Cons(TeacherImpl(name, Nil()), school.teachers), school.courses)
+        SchoolImpl(school.teachers.addUniqueTeacher(TeacherImpl(name, Nil())), school.courses)
 
       override def teacherByName(name: String): Optional[Teacher] = school match
         case SchoolImpl(Cons(h, t), _) => if h.name == name then Optional.Just(h) else teacherByName(name)
