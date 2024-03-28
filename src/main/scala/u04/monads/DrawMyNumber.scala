@@ -65,9 +65,13 @@ object DrawMyNumberGame:
             case "TryButton" =>
                 for
                     text <- mv(nop(), _ => getTextFieldText("EntryTextField"))
-                    res <- mv(guess(text.toInt), sugg => sugg match
-                        case Optional.Just(s) => toLabel(s, "SuggestionLabel")
-                        case _ => toLabel("Correct", "SuggestionLabel"))
+                    _ <- 
+                        if (text.toIntOption.isDefined) then
+                            mv(guess(text.toInt), sugg => sugg match
+                                case Optional.Just(s) => toLabel(s, "SuggestionLabel")
+                                case _ => toLabel("Correct", "SuggestionLabel"))
+                        else 
+                            mv(attemptsLeft(), left => toLabel(s"Invalid value $left attempts left", "SuggestionLabel"))
                 yield {}
             case "ResetButton" => mv(seq(reset(), attemptsLeft()), left => toLabel(s"$left attempts left", "SuggestionLabel"))
             case "QuitButton" => mv(nop(), _ => exec(sys.exit()))))
