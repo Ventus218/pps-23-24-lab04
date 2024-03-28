@@ -8,23 +8,29 @@ object DrawMyNumberGame:
     
     trait DrawMyNumberState:
         type DrawMyNumber
-        def init(maxN: Int): DrawMyNumber
-        def reset(maxN: Int): State[DrawMyNumber, Unit] // TODO: remove if not used
+        def init(maxN: Int, attempts: Int): DrawMyNumber
+        def reset(): State[DrawMyNumber, Unit]
+        /// Returns an empty Optional if the guess is correct otherwise a suggestion String
         def guess(n: Int): State[DrawMyNumber, Optional[String]]
+        def attemptsLeft(): State[DrawMyNumber, Int]
         def nop(): State[DrawMyNumber, Unit]
 
     object DrawMyNumberStateImpl extends DrawMyNumberState:
-        opaque type DrawMyNumber = Int
-        def init(maxN: Int): DrawMyNumber = {val n = scala.util.Random.nextInt(maxN); println(n); n} // TODO: remove debug print
-        def reset(maxN: Int): State[DrawMyNumber, Unit] = State(s => (scala.util.Random.nextInt(maxN), {}))
+        opaque type DrawMyNumber = DrawMyNumberImpl
+        private case class DrawMyNumberImpl(n: Int, attempts: Int, attemptsLeft: Int)
+        def init(maxN: Int, attempts: Int): DrawMyNumber = {val n = scala.util.Random.nextInt(maxN); println(n); DrawMyNumberImpl(n, attempts, attempts)} // TODO: remove debug print
+        def reset(): State[DrawMyNumber, Unit] = State(s => (DrawMyNumberImpl(scala.util.Random.nextInt(s.n), s.attempts, s.attempts), {}))
         def guess(n: Int): State[DrawMyNumber, Optional[String]] =
-            State(s => (s,
-                s match
-                    case i if n == i => Optional.Empty()
-                    case i if n > i => Optional.Just("Too high")
-                    case _ => Optional.Just("Too low")
+            State(s => 
+                val newState = DrawMyNumberImpl(s.n, s.attempts, Math.max(s.attemptsLeft - 1, 0))
+                (newState, newState match
+                    case DrawMyNumberImpl(_, _, left) if left <= 0 => Optional.Just("You lost")
+                    case DrawMyNumberImpl(i, _, _) if n == i => Optional.Empty()
+                    case DrawMyNumberImpl(i, _, left) if n > i => Optional.Just(s"Too high.  $left attempts left")
+                    case DrawMyNumberImpl(_, _, left) => Optional.Just(s"Too low.  $left attempts left")
                 )
             )
+        def attemptsLeft(): State[DrawMyNumber, Int] = State(s => (s, s.attemptsLeft))
         def nop(): State[DrawMyNumber, Unit] = State(s => (s, {}))
 
 
@@ -38,18 +44,19 @@ object DrawMyNumberGame:
             val (sv2, av) = f(am).run(sv)
             ((sm2, sv2), av)
 
-    def windowCreation(): State[Window, Stream[String]] = for 
+    def windowCreation(attemptsLeft: Int): State[Window, Stream[String]] = for 
         _ <- setSize(300, 300)
-        _ <- addLabel(text = "Inserisci un numero", name = "SuggestionLabel")
+        _ <- addLabel(text = s"$attemptsLeft attempts left", name = "SuggestionLabel")
         _ <- addTextField(name = "EntryTextField")
         _ <- addButton(text = "Try!", name = "TryButton")
+        _ <- addButton(text = "Reset", name = "ResetButton")
         _ <- addButton(text = "Quit", name = "QuitButton")
         _ <- show()
         events <- eventStream()
     yield events
 
     val controller = for
-        events <- mv(nop(), i => windowCreation())
+        events <- mv(attemptsLeft(), i => windowCreation(i))
         _ <- seqN(events.map(_ match
             case "TryButton" =>
                 for
@@ -58,7 +65,8 @@ object DrawMyNumberGame:
                         case Optional.Just(s) => toLabel(s, "SuggestionLabel")
                         case _ => toLabel("Correct", "SuggestionLabel"))
                 yield {}
+            case "ResetButton" => mv(seq(reset(), attemptsLeft()), left => toLabel(s"$left attempts left", "SuggestionLabel"))
             case "QuitButton" => mv(nop(), _ => exec(sys.exit()))))
     yield ()
 
-    controller.run((init(100), initialWindow))
+    controller.run((init(100, 5), initialWindow))
