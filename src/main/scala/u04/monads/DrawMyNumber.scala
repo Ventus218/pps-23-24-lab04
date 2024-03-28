@@ -9,7 +9,7 @@ object DrawMyNumberGame:
     trait DrawMyNumberState:
         type DrawMyNumber
         def init(maxN: Int): DrawMyNumber
-        def reset(maxN: Int): State[DrawMyNumber, Unit]
+        def reset(maxN: Int): State[DrawMyNumber, Unit] // TODO: remove if not used
         def guess(n: Int): State[DrawMyNumber, Optional[String]]
         def nop(): State[DrawMyNumber, Unit]
 
