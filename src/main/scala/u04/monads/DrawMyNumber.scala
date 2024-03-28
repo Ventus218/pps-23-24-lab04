@@ -17,21 +17,25 @@ object DrawMyNumberGame:
 
     object DrawMyNumberStateImpl extends DrawMyNumberState:
         opaque type DrawMyNumber = DrawMyNumberImpl
-        private case class DrawMyNumberImpl(n: Int, config: Configuration, attemptsLeft: Int)
-        private case class Configuration(attempts: Int, maxN: Int)
+        private case class DrawMyNumberImpl(n: Int, config: Configuration, attemptsLeft: Int, hasWon: Boolean)
+        private case class Configuration(maxN: Int, attempts: Int)
         def init(maxN: Int, attempts: Int): DrawMyNumber = 
             val n = scala.util.Random.nextInt(maxN)
             println(n) // For testing
-            DrawMyNumberImpl(n, Configuration(attempts, maxN), attempts)
+            DrawMyNumberImpl(n, Configuration(maxN, attempts), attempts, false)
         def reset(): State[DrawMyNumber, Unit] = State(s => (init(s.config.maxN, s.config.attempts), {}))
         def guess(n: Int): State[DrawMyNumber, Optional[String]] =
             State(s => 
-                val newState = DrawMyNumberImpl(s.n, s.config, Math.max(s.attemptsLeft - 1, 0))
+                val newState = DrawMyNumberImpl(
+                    n = s.n,
+                    config = s.config,
+                    attemptsLeft = if s.hasWon then s.attemptsLeft else Math.max(s.attemptsLeft - 1, 0),
+                    hasWon = (s.hasWon || s.n == n) && s.attemptsLeft > 0)
                 (newState, newState match
-                    case DrawMyNumberImpl(_, _, left) if left <= 0 => Optional.Just("You lost")
-                    case DrawMyNumberImpl(i, _, _) if n == i => Optional.Empty()
-                    case DrawMyNumberImpl(i, _, left) if n > i => Optional.Just(s"Too high.  $left attempts left")
-                    case DrawMyNumberImpl(_, _, left) => Optional.Just(s"Too low.  $left attempts left")
+                    case DrawMyNumberImpl(_, _, _, true) => Optional.Empty()
+                    case DrawMyNumberImpl(_, _, left, _) if left == 0 => Optional.Just("You lost")
+                    case DrawMyNumberImpl(i, _, left, _) if n > i => Optional.Just(s"Too high.  $left attempts left")
+                    case DrawMyNumberImpl(_, _, left, _) => Optional.Just(s"Too low.  $left attempts left")
                 )
             )
         def attemptsLeft(): State[DrawMyNumber, Int] = State(s => (s, s.attemptsLeft))
@@ -69,7 +73,7 @@ object DrawMyNumberGame:
                         if (text.toIntOption.isDefined) then
                             mv(guess(text.toInt), sugg => sugg match
                                 case Optional.Just(s) => toLabel(s, "SuggestionLabel")
-                                case _ => toLabel("Correct", "SuggestionLabel"))
+                                case _ => toLabel("You won!", "SuggestionLabel"))
                         else 
                             mv(attemptsLeft(), left => toLabel(s"Invalid value $left attempts left", "SuggestionLabel"))
                 yield {}
