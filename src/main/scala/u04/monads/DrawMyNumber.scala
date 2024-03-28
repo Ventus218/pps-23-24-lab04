@@ -26,17 +26,22 @@ object DrawMyNumberGame:
         def reset(): State[DrawMyNumber, Unit] = State(s => (init(s.config.maxN, s.config.attempts), {}))
         def guess(n: Int): State[DrawMyNumber, Optional[String]] =
             State(s => 
-                val newState = DrawMyNumberImpl(
-                    n = s.n,
-                    config = s.config,
-                    attemptsLeft = if s.hasWon then s.attemptsLeft else Math.max(s.attemptsLeft - 1, 0),
-                    hasWon = (s.hasWon || s.n == n) && s.attemptsLeft > 0)
-                (newState, newState match
-                    case DrawMyNumberImpl(_, _, _, true) => Optional.Empty()
-                    case DrawMyNumberImpl(_, _, left, _) if left == 0 => Optional.Just("You lost")
-                    case DrawMyNumberImpl(i, _, left, _) if n > i => Optional.Just(s"Too high.  $left attempts left")
-                    case DrawMyNumberImpl(_, _, left, _) => Optional.Just(s"Too low.  $left attempts left")
-                )
+                if s.attemptsLeft == 0 || s.hasWon then
+                    (s, s match
+                        case DrawMyNumberImpl(_, _, _, true) => Optional.Empty()
+                        case DrawMyNumberImpl(_, _, _, false) => Optional.Just("You lost"))
+                else
+                    val newState = DrawMyNumberImpl(
+                        n = s.n,
+                        config = s.config,
+                        attemptsLeft = s.attemptsLeft - 1,
+                        hasWon = s.n == n)
+                    (newState, newState match
+                        case DrawMyNumberImpl(_, _, _, true) => Optional.Empty()
+                        case DrawMyNumberImpl(_, _, left, _) if left == 0 => Optional.Just("You lost")
+                        case DrawMyNumberImpl(i, _, left, _) if n > i => Optional.Just(s"Too high.  $left attempts left")
+                        case DrawMyNumberImpl(_, _, left, _) => Optional.Just(s"Too low.  $left attempts left")
+                    )
             )
         def attemptsLeft(): State[DrawMyNumber, Int] = State(s => (s, s.attemptsLeft))
         def nop(): State[DrawMyNumber, Unit] = State(s => (s, {}))
