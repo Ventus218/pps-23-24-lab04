@@ -17,12 +17,16 @@ object DrawMyNumberGame:
 
     object DrawMyNumberStateImpl extends DrawMyNumberState:
         opaque type DrawMyNumber = DrawMyNumberImpl
-        private case class DrawMyNumberImpl(n: Int, attempts: Int, attemptsLeft: Int)
-        def init(maxN: Int, attempts: Int): DrawMyNumber = {val n = scala.util.Random.nextInt(maxN); println(n); DrawMyNumberImpl(n, attempts, attempts)} // TODO: remove debug print
-        def reset(): State[DrawMyNumber, Unit] = State(s => (DrawMyNumberImpl(scala.util.Random.nextInt(s.n), s.attempts, s.attempts), {}))
+        private case class DrawMyNumberImpl(n: Int, config: Configuration, attemptsLeft: Int)
+        private case class Configuration(attempts: Int, maxN: Int)
+        def init(maxN: Int, attempts: Int): DrawMyNumber = 
+            val n = scala.util.Random.nextInt(maxN)
+            println(n) // For testing
+            DrawMyNumberImpl(n, Configuration(attempts, maxN), attempts)
+        def reset(): State[DrawMyNumber, Unit] = State(s => (init(s.config.maxN, s.config.attempts), {}))
         def guess(n: Int): State[DrawMyNumber, Optional[String]] =
             State(s => 
-                val newState = DrawMyNumberImpl(s.n, s.attempts, Math.max(s.attemptsLeft - 1, 0))
+                val newState = DrawMyNumberImpl(s.n, s.config, Math.max(s.attemptsLeft - 1, 0))
                 (newState, newState match
                     case DrawMyNumberImpl(_, _, left) if left <= 0 => Optional.Just("You lost")
                     case DrawMyNumberImpl(i, _, _) if n == i => Optional.Empty()
