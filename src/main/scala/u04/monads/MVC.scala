@@ -31,9 +31,13 @@ package u04.monads
         case "ResetButton" => mv(seq(reset(), get()), i => toLabel(i.toString, "Label1"))
         case "SetButton" => 
           for 
-            a <- mv(nop(), _ => getTextFieldText("SetTextField"))
-            _ <- mv(seq(set(a.toInt), get()), i => toLabel(i.toString, "Label1"))
-          yield {} // TODO: continue here
+            text <- mv(nop(), _ => getTextFieldText("SetTextField"))
+            _ <- 
+              if (text.toIntOption.isDefined) then
+                mv(seq(set(text.toInt), get()), i => toLabel(i.toString, "Label1"))
+              else 
+                mv(get(), i => toLabel(i.toString, "Label1"))
+          yield {}
         case "QuitButton" => mv(nop(), _ => exec(sys.exit()))))
   yield ()
 
