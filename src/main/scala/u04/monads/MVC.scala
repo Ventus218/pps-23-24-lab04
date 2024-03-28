@@ -29,11 +29,11 @@ package u04.monads
         case "IncButton" => mv(seq(inc(), get()), i => toLabel(i.toString, "Label1"))
         case "DecButton" => mv(seq(dec(), get()), i => toLabel(i.toString, "Label1"))
         case "ResetButton" => mv(seq(reset(), get()), i => toLabel(i.toString, "Label1"))
-        case "SetButton" => mv(nop(), _ => 
+        case "SetButton" => 
           for 
-            s <- getTextFieldText("SetTextField")
-            _ <- toLabel(s, "Label1")
-          yield {}) // TODO: continue here
+            a <- mv(nop(), _ => getTextFieldText("SetTextField"))
+            _ <- mv(seq(set(a.toInt), get()), i => toLabel(i.toString, "Label1"))
+          yield {} // TODO: continue here
         case "QuitButton" => mv(nop(), _ => exec(sys.exit()))))
   yield ()
 
