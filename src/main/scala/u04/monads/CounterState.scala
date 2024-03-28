@@ -8,6 +8,7 @@ trait CounterState:
   def inc(): State[Counter, Unit]
   def dec(): State[Counter, Unit]
   def reset(): State[Counter, Unit]
+  def set(v: Int): State[Counter, Unit]
   def get(): State[Counter, Int]
   def nop(): State[Counter, Unit]
 
@@ -20,6 +21,7 @@ object CounterStateImpl extends CounterState:
   def inc(): State[Counter, Unit] = State(i => (i + 1, ()));
   def dec(): State[Counter, Unit] = State(i => (i - 1, ()));
   def reset(): State[Counter, Unit] = State(i => (0, ()));
+  def set(v: Int): State[Counter, Unit] = State(i => (v, ()))
   def get(): State[Counter, Int] = State(i => (i, i));
   def nop(): State[Counter, Unit] = State(i => (i, ()));
 
